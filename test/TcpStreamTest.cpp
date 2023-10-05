@@ -59,7 +59,7 @@ namespace daq::stream {
         }
 
 
-        void NewStreamCb(std::shared_ptr < Stream > newStream)
+        void NewStreamCb(StreamSharedPtr newStream)
         {
             m_ServerStream = newStream;
             std::string clientHost = m_ServerStream->remoteHost();
@@ -109,7 +109,7 @@ namespace daq::stream {
         uint8_t m_buffer[1]; // a bit silly but in the first run we process byte by byte...
         std::thread m_ioWorker;
         TcpServer m_server;
-        std::shared_ptr < Stream > m_ServerStream;
+        StreamSharedPtr m_ServerStream;
     };
 
     const std::string TcpStreamTest::GoodByeMsg = "goodbye!";
@@ -119,7 +119,7 @@ namespace daq::stream {
     {
         static const uint16_t ListeningPort = 5003;
 
-        std::shared_ptr<Stream> workerStream;
+        StreamSharedPtr workerStream;
 
         boost::asio::io_context ioContext;
 
@@ -160,7 +160,7 @@ namespace daq::stream {
             workerStream->asyncReadSome(readWorkerCompleteCb);
         };
 
-        auto newWorkerCb = [&](std::shared_ptr < Stream > newStream)
+        auto newWorkerCb = [&](StreamSharedPtr newStream)
         {
             workerStream = newStream;
             workerStream->asyncInit(initWorkerCompleteCb);
@@ -219,7 +219,7 @@ namespace daq::stream {
     {
         boost::asio::io_context ioc;
 
-        auto newStreamCb = [](std::shared_ptr < Stream > newStream)
+        auto newStreamCb = [](StreamSharedPtr newStream)
         {
 
         };

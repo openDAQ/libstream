@@ -24,7 +24,7 @@ namespace daq::stream {
     class Server {
     public:
         /// executed whenever a new worker got created and is ready for use
-        using NewStreamCb = std::function<void(std::shared_ptr < Stream > newStream)>;
+        using NewStreamCb = std::function<void(StreamSharedPtr newStream)>;
 
         ~Server() = default;
         virtual int start() = 0;

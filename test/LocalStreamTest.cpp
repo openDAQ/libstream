@@ -61,7 +61,7 @@ namespace daq::stream {
         }
 
 
-        void NewStreamCb(std::shared_ptr < Stream > newStream)
+        void NewStreamCb(StreamSharedPtr newStream)
         {
             m_ServerStream = newStream;
             std::string clientHost = m_ServerStream->remoteHost();
@@ -112,7 +112,7 @@ namespace daq::stream {
         uint8_t m_buffer[1]; // a bit silly but in the first run we process byte by byte...
         std::thread m_ioWorker;
         LocalServer m_server;
-        std::shared_ptr < Stream > m_ServerStream;
+        StreamSharedPtr m_ServerStream;
     };
 
     const std::string LocalStreamTest::localEndpointFile = "theEndpoint";
