@@ -64,6 +64,9 @@ endif()
 add_library(${PROJECT_NAME} STATIC ${LIB_SOURCES})
 add_library(daq::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
+# required if this library will ever be linked into a shared object
+set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include/>

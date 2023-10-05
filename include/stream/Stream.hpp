@@ -25,6 +25,9 @@
 namespace daq::stream {
     using ConstBufferVector = std::vector <boost::asio::const_buffer>;
 
+    class Stream;
+    using StreamSharedPtr = std::shared_ptr <Stream>;
+
     /// Base class of a stream.
     /// Used for receiving many small data bits efficiently from and writing to a stream.
     ///

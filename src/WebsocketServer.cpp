@@ -1,4 +1,3 @@
-/* -*- Mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*- */
 #include <functional>
 #include <iostream>
 
@@ -11,9 +10,10 @@
 #include "stream/WebsocketServerStream.hpp"
 #include "stream/utils/boost_compatibility_utils.hpp"
 
-using namespace boost::asio;
-
 namespace daq::stream {
+
+    using namespace boost::asio;
+
     WebsocketServer::WebsocketServer(boost::asio::io_context& readerIoContext, NewStreamCb newStreamCb, uint16_t tcpDataPort)
         : Server(newStreamCb)
         , m_tcpDataPort(tcpDataPort)

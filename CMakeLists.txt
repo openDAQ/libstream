@@ -5,7 +5,7 @@ if (NOT CMAKE_MESSAGE_CONTEXT)
     set(CMAKE_MESSAGE_CONTEXT_SHOW ON CACHE BOOL "Show CMake message context")
 endif()
 
-project(stream VERSION 0.7.3 LANGUAGES CXX)
+project(stream VERSION 1.0.0 LANGUAGES CXX)
 
 if (POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
