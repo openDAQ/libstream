@@ -10,9 +10,9 @@
 #include "stream/WebsocketServerStream.hpp"
 #include "stream/utils/boost_compatibility_utils.hpp"
 
-namespace daq::stream {
+using namespace boost::asio;
 
-    using namespace boost::asio;
+namespace daq::stream {
 
     WebsocketServer::WebsocketServer(boost::asio::io_context& readerIoContext, NewStreamCb newStreamCb, uint16_t tcpDataPort)
         : Server(newStreamCb)
