@@ -66,12 +66,14 @@ boost::system::error_code WebsocketClientStream::init()
     if (ec) {
         return ec;
     }
+
     boost::beast::get_lowest_layer(m_stream).connect(results, ec);
     if (ec) {
         return ec;
     }
     setOptions();
-    m_stream.handshake(m_host, m_path, ec);
+
+    boost_compatibility_utils::handshake(m_stream, m_host, m_path, ec);
     return ec;
 }
 

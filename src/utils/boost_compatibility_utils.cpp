@@ -15,6 +15,15 @@ namespace boost_compatibility_utils
         stream.async_handshake(host, target, handler);
     }
 
+    void handshake(WebsocketStream& stream,
+                   const std::string& host,
+                   const std::string& target,
+                   boost::system::error_code& ec
+                  )
+    {
+        stream.handshake(host, target, ec);
+    }
+
     void async_accept(WebsocketStream& websocket, const BoostHandler& handler)
     {
         websocket.async_accept(handler);
