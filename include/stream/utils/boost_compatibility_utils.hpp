@@ -36,6 +36,12 @@ namespace boost_compatibility_utils
         const std::string& target,
         const BoostHandler& handler);
 
+    void handshake(WebsocketStream& stream,
+                   const std::string& host,
+                   const std::string& target,
+                   boost::system::error_code& ec
+                  );
+
     void async_accept(WebsocketStream& websocket, const BoostHandler& handler);
 
     void async_write(boost::beast::tcp_stream& stream,

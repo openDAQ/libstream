@@ -28,11 +28,11 @@ namespace daq::stream {
     {
         m_initCompletionCb = completionCb;
         if (m_socket.is_open()) {
-            auto completionCb = [this]()
+            auto completion = [this]()
             {
                 m_initCompletionCb(boost::system::error_code());
             };
-            m_ioc.dispatch(completionCb);
+            m_ioc.dispatch(completion);
             return;
         }
         // Look up the domain name.
