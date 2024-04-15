@@ -83,16 +83,13 @@ if (NOT TARGET Boost::beast)
 
         set(BOOST_LIBS ${Boost_LIBRARIES})
     else (Boost_FOUND)
-        message(STATUS "Fetching Boost ${Boost_REQUIREDVERSION}...")
-        FetchContent_Declare(
-            Boost
-            GIT_REPOSITORY https://github.com/boostorg/boost.git
-            GIT_TAG boost-${Boost_REQUIREDVERSION}
-            GIT_SHALLOW TRUE
-            GIT_PROGRESS ON
-            GIT_REMOTE_UPDATE_STRATEGY REBASE
+        message(STATUS "Pre-installed required Boost not found. Fetching Boost 1.82.0 ...")
+        get_custom_fetch_content_params(Boost FC_PARAMS)
+        FetchContent_Declare(Boost
+                             URL      https://github.com/boostorg/boost/releases/download/boost-1.82.0/boost-1.82.0.tar.xz
+                             URL_HASH SHA256=fd60da30be908eff945735ac7d4d9addc7f7725b1ff6fcdcaede5262d511d21e
+                             ${FC_PARAMS}
         )
-
         FetchContent_MakeAvailable(Boost)
     endif (Boost_FOUND)
 endif()
