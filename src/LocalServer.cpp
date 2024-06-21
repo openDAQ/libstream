@@ -36,8 +36,8 @@ namespace daq::stream {
     int LocalServer::start()
     {
         if (!m_useAbstractNamespace) {
-            // When not using abstract name space, try to remove the existing unix domain socket endpoint file.
-            ::remove(m_localEndpointFile.c_str());
+            // When not using abstract name space, try to unlink the existing unix domain socket endpoint file.
+            ::unlink(m_localEndpointFile.c_str());
         }
 
         try {
