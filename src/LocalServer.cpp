@@ -58,8 +58,8 @@ namespace daq::stream {
         syslog(LOG_INFO, "Stopping local server");
         m_localAcceptor.close();
         if (!m_useAbstractNamespace) {
-            /// \todo When using non-abstract namespace, the endpoint file ist not being removed!
-            ::remove(m_localEndpointFile.c_str());
+            // unlink non-abstract unix domain socket
+            ::unlink(m_localEndpointFile.c_str());
         }
     }
 
