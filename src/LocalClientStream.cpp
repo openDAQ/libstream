@@ -8,11 +8,24 @@
 #include "stream/LocalClientStream.hpp"
 
 namespace daq::stream {
-    LocalClientStream::LocalClientStream(boost::asio::io_context& ioc, const std::string &endPointFile)
+    LocalClientStream::LocalClientStream(boost::asio::io_context& ioc, const std::string &endPointFile, bool useAbstractNamespace)
         : LocalStream(ioc)
         , m_ioc(ioc)
         , m_endpointFile(endPointFile)
+        , m_useAbstractNamespace(useAbstractNamespace)
     {
+    }
+
+    // placing a '\0' at the beginning of the endpoint name creates an abstract unix domain socket.
+    // See man page (man 7 unix) for details
+    static std::string getEndPointFileName(const std::string& localEndpointFile, bool useAbstractNamespace)
+    {
+        std::string endpointFileName;
+        if (useAbstractNamespace) {
+            endpointFileName = std::string("\0", 1);
+        }
+        endpointFileName += std::string(localEndpointFile);
+        return endpointFileName;
     }
 
     void LocalClientStream::asyncInit(CompletionCb completionCb)
@@ -27,10 +40,9 @@ namespace daq::stream {
             return;
         }
 
-        // placing a '\0' at the beginning of the endpoint name creates an abstract unix domain socket.
-        // See man page (man 7 unix) for details
+        std::string endpointFileName = getEndPointFileName(m_endpointFile, m_useAbstractNamespace);
         m_socket.async_connect(
-                    boost::asio::local::stream_protocol::endpoint(std::string("\0", 1) + std::string(m_endpointFile)),
+                    boost::asio::local::stream_protocol::endpoint(endpointFileName),
                     std::bind(m_initCompletionCb, std::placeholders::_1));
     }
 
@@ -40,10 +52,9 @@ namespace daq::stream {
             return boost::system::error_code();
         }
         boost::system::error_code ec;
-        // placing a '\0' at the beginning of the endpoint name creates an abstract unix domain socket.
-        // See man page (man 7 unix) for details
+        std::string endpointFileName = getEndPointFileName(m_endpointFile, m_useAbstractNamespace);
         m_socket.connect(
-                    boost::asio::local::stream_protocol::endpoint(std::string("\0", 1) + std::string(m_endpointFile)),
+                    boost::asio::local::stream_protocol::endpoint(endpointFileName),
                     ec);
         return ec;
     }
