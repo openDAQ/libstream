@@ -8,35 +8,60 @@
 #include "stream/LocalServerStream.hpp"
 
 namespace daq::stream {
-    LocalServer::LocalServer(boost::asio::io_context& readerIoContext, NewStreamCb newStreamCb, const std::string& localEndpointFile)
+    // placing a '\0' at the beginning of the endpoint name creates an abstract unix domain socket.
+    // See man page (man 7 unix) for details
+    static std::string getEndPointFileName(const std::string& localEndpointFile, bool useAbstractNamespace)
+    {
+        std::string endpointFileName;
+        if (useAbstractNamespace) {
+            endpointFileName = std::string("\0", 1);
+        }
+        endpointFileName += std::string(localEndpointFile);
+        return endpointFileName;
+    }
+
+    LocalServer::LocalServer(boost::asio::io_context& readerIoContext, NewStreamCb newStreamCb, const std::string& localEndpointFile, bool useAbstractNamespace)
         : Server(newStreamCb)
         , m_localEndpointFile(localEndpointFile)
-        , m_localAcceptor(readerIoContext, std::string("\0", 1) + std::string(localEndpointFile))
+        , m_useAbstractNamespace(useAbstractNamespace)
+        , m_localAcceptor(readerIoContext)
     {
     }
 
-
-    
     LocalServer::~LocalServer()
     {
         stop();
     }
-    
-    
+
     int LocalServer::start()
     {
-        syslog(LOG_INFO, "Starting local server");
-        startAccept();
-        return 0;
+        if (!m_useAbstractNamespace) {
+            // When not using abstract name space, try to unlink the existing unix domain socket endpoint file.
+            ::unlink(m_localEndpointFile.c_str());
+        }
+
+        try {
+            m_localAcceptor.open();
+            m_localAcceptor.bind(getEndPointFileName(m_localEndpointFile, m_useAbstractNamespace));
+            m_localAcceptor.listen();
+            syslog(LOG_INFO, "Starting local server");
+            startAccept();
+            return 0;
+        }  catch (const std::runtime_error& exc) {
+            syslog(LOG_ERR, "Exception on start of local server: %s", exc.what());
+            return -1;
+        }
     }
-    
+
     void LocalServer::stop()
     {
         syslog(LOG_INFO, "Stopping local server");
         m_localAcceptor.close();
+        if (!m_useAbstractNamespace) {
+            // unlink non-abstract unix domain socket
+            ::unlink(m_localEndpointFile.c_str());
+        }
     }
-
-    
 
     void LocalServer::startAccept()
     {
