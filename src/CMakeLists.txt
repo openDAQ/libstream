@@ -47,6 +47,7 @@ if (NOT WIN32)
             LocalClientStream.cpp
             LocalServer.cpp
             LocalServerStream.cpp
+	    LocalStream.cpp
     )
 endif()
 
