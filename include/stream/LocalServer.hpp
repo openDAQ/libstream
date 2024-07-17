@@ -23,8 +23,9 @@
 
 namespace daq::stream {
     class LocalServer : public Server {
-    public:       
-        LocalServer(boost::asio::io_context& readerIoContext, NewStreamCb newStreamCb, const std::string &localEndpointFile);
+    public:
+        /// \param useAbstractNamespace true if unix domain socket is in abstract namespace
+        LocalServer(boost::asio::io_context& readerIoContext, NewStreamCb newStreamCb, const std::string &localEndpointFile, bool useAbstractNamespace);
         LocalServer(const LocalServer&) = delete;
         LocalServer& operator= (const LocalServer&) = delete;
         virtual ~LocalServer();
@@ -35,6 +36,7 @@ namespace daq::stream {
         void onAccept(const boost::system::error_code& ec, boost::asio::local::stream_protocol::socket&& streamSocket);
         
         std::string m_localEndpointFile;
+        bool m_useAbstractNamespace;
         boost::asio::local::stream_protocol::acceptor m_localAcceptor;
     };
 }

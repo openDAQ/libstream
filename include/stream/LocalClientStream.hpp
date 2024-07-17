@@ -25,8 +25,8 @@ namespace daq::stream {
 class LocalClientStream : public LocalStream
 {
 public:
-    /// Resolver and socket require an io_context
-    explicit LocalClientStream(boost::asio::io_context& ioc, const std::string& endPointFile);
+    /// \param useAbstractNamespace true if unix domain socket is in abstract namespace
+    explicit LocalClientStream(boost::asio::io_context& ioc, const std::string& endPointFile, bool useAbstractNamespace);
     LocalClientStream(const LocalClientStream&) = delete;
     LocalClientStream& operator= (LocalClientStream&) = delete;
 
@@ -40,5 +40,6 @@ private:
 
     boost::asio::io_context& m_ioc;
     std::string m_endpointFile;
+    bool m_useAbstractNamespace;
 };
 }
