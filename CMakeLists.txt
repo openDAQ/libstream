@@ -67,7 +67,7 @@ target_compile_definitions(websocket INTERFACE BOOST_ALL_NO_LIB)
 
 if (NOT TARGET Boost::beast)
     # we are using headers only (asio and beast for websockets)
-    set(Boost_REQUIREDVERSION "1.71.0")
+    set(Boost_REQUIREDVERSION "1.90.0")
     set(Boost_USE_MULTITHREADED ON)
     set(Boost_USE_STATIC_LIBS ON)
     find_package(Boost ${Boost_REQUIREDVERSION} COMPONENTS system)
@@ -83,11 +83,11 @@ if (NOT TARGET Boost::beast)
 
         set(BOOST_LIBS ${Boost_LIBRARIES})
     else (Boost_FOUND)
-        message(STATUS "Pre-installed required Boost not found. Fetching Boost 1.82.0 ...")
+        message(STATUS "Pre-installed required Boost not found. Fetching Boost 1.90.0 ...")
         get_custom_fetch_content_params(Boost FC_PARAMS)
         FetchContent_Declare(Boost
-                             URL      https://github.com/boostorg/boost/releases/download/boost-1.82.0/boost-1.82.0.tar.xz
-                             URL_HASH SHA256=fd60da30be908eff945735ac7d4d9addc7f7725b1ff6fcdcaede5262d511d21e
+                             URL      https://github.com/boostorg/boost/releases/download/boost-1.90.0/boost-1.90.0-cmake.tar.xz
+                             URL_HASH SHA256=aca59f889f0f32028ad88ba6764582b63c916ce5f77b31289ad19421a96c555f
                              ${FC_PARAMS}
         )
         FetchContent_MakeAvailable(Boost)
