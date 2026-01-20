@@ -1,10 +1,17 @@
 #include "stream/Stream.hpp"
+#include <boost/asio/buffer.hpp>
 
 namespace daq::stream {
 
 void Stream::copyDataAndConsume(void* dest, size_t size)
 {
-    memcpy(dest, boost::asio::buffer_cast<const void*>(m_buffer.data()), size);
+    auto buffers = m_buffer.data();
+    // For streambuf, use boost::asio::buffer() to get a single buffer view
+    // This works because streambuf::data() returns a contiguous buffer sequence
+    auto buf = boost::asio::buffer(buffers);
+    // In Boost.Asio 1.90+, const_buffer has a data() member function
+    const void* data_ptr = buf.data();
+    std::memcpy(dest, data_ptr, size);
     m_buffer.consume(size);
 }
 
@@ -15,7 +22,11 @@ size_t Stream::size() const
 
 const uint8_t* Stream::data() const
 {
-    return boost::asio::buffer_cast<const uint8_t*>(m_buffer.data());
+    auto buffers = m_buffer.data();
+    // Use boost::asio::buffer() to get a single buffer view from the sequence
+    auto buf = boost::asio::buffer(buffers);
+    // const_buffer has a data() member function that returns const void*
+    return static_cast<const uint8_t*>(buf.data());
 }
 
 void Stream::consume(size_t size)

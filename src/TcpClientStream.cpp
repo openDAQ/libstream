@@ -6,6 +6,7 @@
 
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
+#include <boost/asio/dispatch.hpp>
 
 #include "stream/TcpClientStream.hpp"
 
@@ -32,7 +33,7 @@ namespace daq::stream {
             {
                 m_initCompletionCb(boost::system::error_code());
             };
-            m_ioc.dispatch(completion);
+            boost::asio::dispatch(m_ioc, completion);
             return;
         }
         // Look up the domain name.
@@ -83,7 +84,7 @@ namespace daq::stream {
             return;
         }
 
-        m_connectTimer.expires_from_now(boost::posix_time::milliseconds(m_connectTimeout.count()));
+        m_connectTimer.expires_after(m_connectTimeout);
         m_connectTimer.async_wait(std::bind(&TcpClientStream::connectTimeoutCb, this, std::placeholders::_1));
         // Make the connection on the IP address we got from the lookup
         m_socket.async_connect(

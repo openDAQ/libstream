@@ -6,6 +6,7 @@
 
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
+#include <boost/asio/dispatch.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
 
@@ -37,7 +38,7 @@ void WebsocketClientStream::asyncInit(CompletionCb completionCb)
         {
             m_initCompletionCb(boost::system::error_code());
         };
-        m_ioc.dispatch(completion);
+        boost::asio::dispatch(m_ioc, completion);
         return;
     }
     // Look up the domain name.
@@ -84,7 +85,7 @@ void WebsocketClientStream::onResolve(const boost::beast::error_code& ec, boost:
         return;
     }
 
-    m_asyncOperationTimer.expires_from_now(boost::posix_time::milliseconds(m_asyncTimeout.count()));
+    m_asyncOperationTimer.expires_after(m_asyncTimeout);
     m_asyncOperationTimer.async_wait(std::bind(&WebsocketClientStream::asyncTimeoutCb, this, std::placeholders::_1));
 
     // Make the connection on the IP address we got from the lookup
@@ -105,7 +106,7 @@ void WebsocketClientStream::onConnect(const boost::beast::error_code& ec)
     setOptions();
 
     // Perform the websocket handshake
-    m_asyncOperationTimer.expires_from_now(boost::posix_time::milliseconds(m_asyncTimeout.count()));
+    m_asyncOperationTimer.expires_after(m_asyncTimeout);
     m_asyncOperationTimer.async_wait(std::bind(&WebsocketClientStream::asyncTimeoutCb, this, std::placeholders::_1));
 
     boost_compatibility_utils::async_handshake(m_stream, m_host, m_path, [this](const boost::beast::error_code& err)
