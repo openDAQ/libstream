@@ -57,10 +57,14 @@ endif()
 
 set(STREAM_TEST_LIB stream_test_lib)
 add_library(${STREAM_TEST_LIB} OBJECT ${TEST_LIB_SOURCES})
-target_include_directories(${STREAM_TEST_LIB} PUBLIC ${Boost_INCLUDE_DIRS})
+
+# Link to websocket target which provides Boost includes (works with both find_package and FetchContent)
+target_link_libraries(${STREAM_TEST_LIB} PUBLIC daq::websocket)
+
 target_compile_options(${STREAM_TEST_LIB} PRIVATE
  $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
   -Wall -Werror ${CGOV_COMPILE_FLAGS} ${ASAN_COMPILE_FLAGS}>
+ $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
 )
 
 target_compile_definitions(${STREAM_TEST_LIB} PRIVATE
@@ -75,13 +79,11 @@ set_target_properties(${STREAM_TEST_LIB} PROPERTIES
   CXX_EXTENSIONS OFF
 )
 
-target_include_directories(stream_test_lib PRIVATE ../include)
 target_link_options(${STREAM_TEST_LIB} PRIVATE ${GCOV_LINK_FLAGS})
 target_link_libraries(
   ${STREAM_TEST_LIB}
   PUBLIC ${ASAN_LIB}
          ${GCOV_LIB}
-         ${Boost_LIBRARIES}
 )
 
 # Windows does not support UNIX domain sockets
@@ -109,6 +111,7 @@ foreach(tgt ${targets})
     target_compile_options(${tgt} PRIVATE
      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
           -Wall -Werror ${CGOV_COMPILE_FLAGS} ${ASAN_COMPILE_FLAGS}>
+     $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
     )
     # requires cmake 3.13
     target_link_options(${tgt} PRIVATE ${GCOV_LINK_FLAGS} )
