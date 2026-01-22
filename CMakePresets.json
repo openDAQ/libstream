@@ -69,6 +69,24 @@
             }
         },
         {
+            "name": "msvc-22",
+            "hidden": true,
+            "generator": "Visual Studio 17 2022",
+            "inherits": [
+                "base"
+            ],
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": [ "Windows" ]
+                }
+            }
+        },
+        {
             "name": "x64/msvc-17",
             "architecture": "x64",
             "inherits": [
@@ -80,6 +98,20 @@
             "architecture": "Win32",
             "inherits": [
                 "msvc-17"
+            ]
+        },
+        {
+            "name": "x64/msvc-22",
+            "architecture": "x64",
+            "inherits": [
+                "msvc-22"
+            ]
+        },
+        {
+            "name": "x86/msvc-22",
+            "architecture": "Win32",
+            "inherits": [
+                "msvc-22"
             ]
         }
     ]

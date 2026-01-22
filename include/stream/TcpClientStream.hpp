@@ -17,7 +17,7 @@
 #pragma once
 
 #include <string>
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/system_timer.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 #include "stream/TcpStream.hpp"
@@ -58,7 +58,7 @@ namespace daq::stream {
         std::string m_host;
         std::string m_port;
         boost::asio::ip::tcp::resolver m_resolver;
-        boost::asio::deadline_timer m_connectTimer;
+        boost::asio::system_timer m_connectTimer;
         std::chrono::milliseconds m_connectTimeout;
     };
 }

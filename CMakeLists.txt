@@ -5,7 +5,7 @@ if (NOT CMAKE_MESSAGE_CONTEXT)
     set(CMAKE_MESSAGE_CONTEXT_SHOW ON CACHE BOOL "Show CMake message context")
 endif()
 
-project(stream VERSION 1.0.3 LANGUAGES CXX)
+project(stream VERSION 1.0.4 LANGUAGES CXX)
 
 if (POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
@@ -67,7 +67,7 @@ target_compile_definitions(websocket INTERFACE BOOST_ALL_NO_LIB)
 
 if (NOT TARGET Boost::beast)
     # we are using headers only (asio and beast for websockets)
-    set(Boost_REQUIREDVERSION "1.71.0")
+    set(Boost_REQUIREDVERSION "1.90.0")
     set(Boost_USE_MULTITHREADED ON)
     set(Boost_USE_STATIC_LIBS ON)
     find_package(Boost ${Boost_REQUIREDVERSION} COMPONENTS system)
@@ -83,14 +83,37 @@ if (NOT TARGET Boost::beast)
 
         set(BOOST_LIBS ${Boost_LIBRARIES})
     else (Boost_FOUND)
-        message(STATUS "Pre-installed required Boost not found. Fetching Boost 1.82.0 ...")
+        message(STATUS "Pre-installed required Boost not found. Fetching Boost 1.90.0 ...")
         get_custom_fetch_content_params(Boost FC_PARAMS)
         FetchContent_Declare(Boost
-                             URL      https://github.com/boostorg/boost/releases/download/boost-1.82.0/boost-1.82.0.tar.xz
-                             URL_HASH SHA256=fd60da30be908eff945735ac7d4d9addc7f7725b1ff6fcdcaede5262d511d21e
+                             URL      https://github.com/boostorg/boost/releases/download/boost-1.90.0/boost-1.90.0-cmake.tar.xz
+                             URL_HASH SHA256=aca59f889f0f32028ad88ba6764582b63c916ce5f77b31289ad19421a96c555f
                              ${FC_PARAMS}
         )
         FetchContent_MakeAvailable(Boost)
+        
+        # Set up Boost include directories for FetchContent case
+        # When using FetchContent, we need to manually add the Boost source directory to includes
+        FetchContent_GetProperties(Boost SOURCE_DIR Boost_SOURCE_DIR)
+        if(Boost_SOURCE_DIR)
+            target_include_directories(websocket INTERFACE
+                $<BUILD_INTERFACE:${Boost_SOURCE_DIR}>
+            )
+        endif()
+        
+        # Exclude boost_log (has compatibility issues with Boost 1.90.0 on Windows)
+        if(TARGET boost_log)
+            set_target_properties(boost_log PROPERTIES EXCLUDE_FROM_ALL TRUE)
+            # Try to convert to interface library to prevent compilation
+            get_target_property(boost_log_type boost_log TYPE)
+            if(boost_log_type AND boost_log_type STREQUAL "STATIC_LIBRARY")
+                # Can't change type after creation, but we can try to remove sources
+                set_target_properties(boost_log PROPERTIES SOURCES "")
+            endif()
+        endif()
+        if(TARGET boost_log_setup)
+            set_target_properties(boost_log_setup PROPERTIES EXCLUDE_FROM_ALL TRUE)
+        endif()
     endif (Boost_FOUND)
 endif()
 

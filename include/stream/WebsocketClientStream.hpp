@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/system_timer.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
@@ -78,7 +78,7 @@ private:
     std::string m_path;
     boost::beast::websocket::stream<boost::beast::tcp_stream> m_stream;
     boost::asio::ip::tcp::resolver m_resolver;
-    boost::asio::deadline_timer m_asyncOperationTimer;
+    boost::asio::system_timer m_asyncOperationTimer;
     std::chrono::milliseconds m_asyncTimeout;
 };
 }

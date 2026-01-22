@@ -17,7 +17,6 @@
 #pragma once
 
 #include <string>
-#include <boost/asio/deadline_timer.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 #include "Stream.hpp"
