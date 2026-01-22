@@ -53,6 +53,24 @@
         {
             "name": "msvc-17",
             "hidden": true,
+            "generator": "Visual Studio 15 2017",
+            "inherits": [
+                "base"
+            ],
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": [ "Windows" ]
+                }
+            }
+        },
+        {
+            "name": "msvc-22",
+            "hidden": true,
             "generator": "Visual Studio 17 2022",
             "inherits": [
                 "base"
