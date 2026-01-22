@@ -99,6 +99,20 @@
             "inherits": [
                 "msvc-17"
             ]
+        },
+        {
+            "name": "x64/msvc-22",
+            "architecture": "x64",
+            "inherits": [
+                "msvc-22"
+            ]
+        },
+        {
+            "name": "x86/msvc-22",
+            "architecture": "Win32",
+            "inherits": [
+                "msvc-22"
+            ]
         }
     ]
 }
