@@ -1,6 +1,5 @@
-# target_link_options requires cmake >= 3.13
-cmake_minimum_required(VERSION 3.13)
-set_cmake_folder_context(TARGET_FOLDER_NAME)
+cmake_minimum_required(VERSION 3.24)
+opendaq_set_cmake_folder_context(TARGET_FOLDER_NAME)
 project(libstream-test CXX)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -57,10 +56,10 @@ endif()
 
 set(STREAM_TEST_LIB stream_test_lib)
 add_library(${STREAM_TEST_LIB} OBJECT ${TEST_LIB_SOURCES})
-target_include_directories(${STREAM_TEST_LIB} PUBLIC ${Boost_INCLUDE_DIRS})
 target_compile_options(${STREAM_TEST_LIB} PRIVATE
- $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-  -Wall -Werror ${CGOV_COMPILE_FLAGS} ${ASAN_COMPILE_FLAGS}>
+  $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Werror ${CGOV_COMPILE_FLAGS} ${ASAN_COMPILE_FLAGS}>
+  $<$<CXX_COMPILER_ID:GNU>:-Wno-maybe-uninitialized>
+  $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
 )
 
 target_compile_definitions(${STREAM_TEST_LIB} PRIVATE
@@ -81,7 +80,7 @@ target_link_libraries(
   ${STREAM_TEST_LIB}
   PUBLIC ${ASAN_LIB}
          ${GCOV_LIB}
-         ${Boost_LIBRARIES}
+         daq::websocket
 )
 
 # Windows does not support UNIX domain sockets

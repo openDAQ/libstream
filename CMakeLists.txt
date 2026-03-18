@@ -1,24 +1,26 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.24)
 
 if (NOT CMAKE_MESSAGE_CONTEXT)
     set(CMAKE_MESSAGE_CONTEXT stream)
     set(CMAKE_MESSAGE_CONTEXT_SHOW ON CACHE BOOL "Show CMake message context")
 endif()
 
-project(stream VERSION 1.0.3 LANGUAGES CXX)
+project(stream VERSION 1.0.4 LANGUAGES CXX)
+
+add_subdirectory(cmake)
 
 if (POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
 get_filename_component(ROOT_DIR ${CMAKE_SOURCE_DIR} REALPATH)
-if (NOT ${PROJECT_SOURCE_DIR} STREQUAL ${ROOT_DIR})
-    set(BUILDING_AS_SUBMODULE ON)
-    message(STATUS "Building as submodule")
-else()
+
+if (PROJECT_IS_TOP_LEVEL)
     message(STATUS "Building standalone")
     set(CMAKE_FOLDER "${CMAKE_FOLDER}/stream")
     set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ".CMakePredefinedTargets")
+else()
+    message(STATUS "Building as submodule")
 endif()
 
 option(LIBSTREAM_POST_BUILD_UNITTEST  "Automatically run unit-tests as a post build step" OFF)
@@ -40,8 +42,12 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake
 
 set(FETCHCONTENT_EXTERNALS_DIR ${ROOT_DIR}/build/__external CACHE PATH "FetchContent folder prefix")
 
-include(StreamUtils)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+opendaq_get_cmake_mode(_LIBSTREAM_CMAKE_MODE)
+if (NOT _LIBSTREAM_CMAKE_MODE)
+    opendaq_set_cmake_mode(MODERN)
+endif()
 
 if (WIN32)
     set(MIN_SUPPORTED_WINDOWS 0x0601)
@@ -53,54 +59,10 @@ if (WIN32)
     message(STATUS "Setting minimum supported API to Windows 7 (${MIN_SUPPORTED_WINDOWS})")
 endif()
 
-if (NOT COMMAND set_mode)
-    message(STATUS "Including Modern.cmake")
-    include(Modern)
-else()
-    set_mode(MODERN)
-endif()
-
 add_library(websocket INTERFACE)
 add_library(daq::websocket ALIAS websocket)
 
 target_compile_definitions(websocket INTERFACE BOOST_ALL_NO_LIB)
-
-if (NOT TARGET Boost::beast)
-    # we are using headers only (asio and beast for websockets)
-    set(Boost_REQUIREDVERSION "1.71.0")
-    set(Boost_USE_MULTITHREADED ON)
-    set(Boost_USE_STATIC_LIBS ON)
-    find_package(Boost ${Boost_REQUIREDVERSION} COMPONENTS system)
-
-    if (Boost_FOUND)
-        message(STATUS "Boost ${Boost_VERSION_STRING} at: ${Boost_INCLUDE_DIRS} | ${Boost_LIBRARY_DIRS}")
-
-        target_link_libraries(websocket INTERFACE ${Boost_LIBRARIES})
-        target_include_directories(websocket INTERFACE
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-            $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
-        )
-
-        set(BOOST_LIBS ${Boost_LIBRARIES})
-    else (Boost_FOUND)
-        message(STATUS "Pre-installed required Boost not found. Fetching Boost 1.82.0 ...")
-        get_custom_fetch_content_params(Boost FC_PARAMS)
-        FetchContent_Declare(Boost
-                             URL      https://github.com/boostorg/boost/releases/download/boost-1.82.0/boost-1.82.0.tar.xz
-                             URL_HASH SHA256=fd60da30be908eff945735ac7d4d9addc7f7725b1ff6fcdcaede5262d511d21e
-                             ${FC_PARAMS}
-        )
-        FetchContent_MakeAvailable(Boost)
-    endif (Boost_FOUND)
-endif()
-
-if (TARGET Boost::beast)
-    target_link_libraries(websocket
-        INTERFACE
-            $<BUILD_INTERFACE:Boost::beast>
-            $<BUILD_INTERFACE:Boost::align>
-    )
-endif()
 
 if (ENABLE_ASAN)
     set(ASAN_COMPILE_FLAGS -fsanitize=address -fno-omit-frame-pointer)
@@ -108,6 +70,13 @@ if (ENABLE_ASAN)
 endif()
 
 add_subdirectory(external)
+
+target_link_libraries(websocket
+    INTERFACE
+        $<BUILD_INTERFACE:Boost::beast>
+        $<BUILD_INTERFACE:Boost::align>
+)
+
 add_subdirectory(src)
 
 # install the library and generate export set (note that no

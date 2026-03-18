@@ -5,3 +5,9 @@ Initial version of libstream.
 ## v1.0.1
 
 Fix Microsoft Visual Studio 2017 compilation
+
+## v1.0.4
+
+Migrate to opendaq-cmake-utils
+Add CI build: Ubuntu, macOS, Windows
+Fix macOS tests

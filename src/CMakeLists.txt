@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.24)
 
 set(INTERFACE_HEADERS
     Stream.hpp
@@ -23,7 +23,7 @@ if (NOT WIN32)
     )
 endif()
 
-prepend_include(${PROJECT_NAME} INTERFACE_HEADERS)
+opendaq_prepend_include(${PROJECT_NAME} INTERFACE_HEADERS)
 
 set(LIB_SOURCES
     ${INTERFACE_HEADERS}
@@ -75,7 +75,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_THREAD_LIBS_INIT}
                                              daq::websocket
-                                             ${Boost_LIBRARIES}
 )
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
