@@ -118,6 +118,9 @@ namespace daq::stream {
     const std::string LocalStreamTest::localEndpointFile = "theEndpoint";
     const std::string LocalStreamTest::GoodByeMsg = "goodbye!";
 
+// Abstract Unix domain sockets (Linux-only feature, not supported on macOS)
+#ifndef __APPLE__
+
 
 
     TEST_F(LocalStreamTest, test_connect)
@@ -461,4 +464,5 @@ namespace daq::stream {
             ASSERT_EQ(response, GoodByeMsg);
         }
     }
+#endif // __APPLE__
 }

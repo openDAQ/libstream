@@ -1,6 +1,5 @@
-# option global for find_package was introduced with 3.24
 cmake_minimum_required(VERSION 3.24)
-set_cmake_folder_context(TARGET_FOLDER_NAME)
+opendaq_set_cmake_folder_context(TARGET_FOLDER_NAME)
 
 set(GTest_REQUIREDVERSION "1.12.1")
 
@@ -11,7 +10,7 @@ else()
     message(STATUS "Fetching GTest version ${GTest_REQUIREDVERSION}")
 
     include(FetchContent)
-    get_custom_fetch_content_params(GTest FC_PARAMS)
+    opendaq_get_custom_fetch_content_params(GTest FC_PARAMS)
 
     set(GTest_WITH_POST_BUILD_UNITTEST OFF)
     set(GTest_WITH_TESTS OFF)

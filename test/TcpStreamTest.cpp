@@ -15,7 +15,7 @@ namespace daq::stream {
 
     protected:
         static const std::string GoodByeMsg;
-        static const uint16_t ListeningPort = 5000;
+        static const uint16_t ListeningPort = 5100;
 
         TcpStreamTest()
             : m_server(m_ioContext, std::bind(&TcpStreamTest::NewStreamCb, this, std::placeholders::_1), ListeningPort)
@@ -214,7 +214,7 @@ namespace daq::stream {
     }
 
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__APPLE__)
     TEST_F(TcpStreamTest, test_forbidden_port)
     {
         boost::asio::io_context ioc;

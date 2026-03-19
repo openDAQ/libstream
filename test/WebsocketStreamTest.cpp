@@ -690,7 +690,7 @@ namespace daq::stream {
         WebsocketClientStream clientStream(m_ioContext, "localhost", std::to_string(ListeningPort), Path);
         boost::system::error_code ec;
         std::chrono::milliseconds cycleTime(1);
-        std::chrono::milliseconds waittime;
+        std::chrono::milliseconds waittime(0);
         std::chrono::milliseconds maxWatitime(100);
         
         ec = clientStream.init();
