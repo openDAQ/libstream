@@ -13,6 +13,7 @@
 
 
 namespace daq::stream {
+    static constexpr bool useAbstractNamespace = false;
     class LocalStreamTest : public ::testing::Test {
 
     protected:
@@ -20,7 +21,7 @@ namespace daq::stream {
         static const std::string localEndpointFile;
 
         LocalStreamTest()
-            : m_server(m_ioContext, std::bind(&LocalStreamTest::NewStreamCb, this, std::placeholders::_1), localEndpointFile)
+            : m_server(m_ioContext, std::bind(&LocalStreamTest::NewStreamCb, this, std::placeholders::_1), localEndpointFile, useAbstractNamespace)
         {
         }
 
@@ -130,7 +131,7 @@ namespace daq::stream {
 
         {
             // succesfull connect
-            LocalClientStream clientStream(m_ioContext, localEndpointFile);
+            LocalClientStream clientStream(m_ioContext, localEndpointFile, useAbstractNamespace);
             serverHost = clientStream.remoteHost();
             endpointUrl = clientStream.endPointUrl();
             ASSERT_EQ("", serverHost);
@@ -143,10 +144,14 @@ namespace daq::stream {
 
         {
             // wrong endpoint file
-            LocalClientStream clientStream(m_ioContext, localEndpointFile + "bla");
+            LocalClientStream clientStream(m_ioContext, localEndpointFile + "bla", useAbstractNamespace);
 
             boost::system::error_code ec = clientStream.init();
-            ASSERT_EQ(ec, boost::system::errc::connection_refused);
+            if (useAbstractNamespace) {
+                ASSERT_EQ(ec, boost::system::errc::connection_refused);
+            } else {
+                ASSERT_EQ(ec, boost::system::errc::no_such_file_or_directory);
+            }
         }
     }
 
@@ -157,7 +162,7 @@ namespace daq::stream {
 
         {
             // succesfull connect
-            LocalClientStream clientStream(m_ioContext, localEndpointFile);
+            LocalClientStream clientStream(m_ioContext, localEndpointFile, useAbstractNamespace);
             serverHost = clientStream.remoteHost();
             endpointUrl = clientStream.endPointUrl();
             ASSERT_EQ("", serverHost);
@@ -177,7 +182,7 @@ namespace daq::stream {
 
         {
             // wrong endpoint file
-            LocalClientStream clientStream(m_ioContext, localEndpointFile + "bla");
+            LocalClientStream clientStream(m_ioContext, localEndpointFile + "bla", useAbstractNamespace);
 
             std::promise < boost::system::error_code > initPromise;
             std::future < boost::system::error_code > initFuture = initPromise.get_future();
@@ -189,14 +194,19 @@ namespace daq::stream {
 
             clientStream.asyncInit(completionCb);
             initFuture.wait();
-            ASSERT_EQ(initFuture.get(), boost::system::errc::connection_refused);
+            if (useAbstractNamespace) {
+                ASSERT_EQ(initFuture.get(), boost::system::errc::connection_refused);
+            } else {
+                ASSERT_EQ(initFuture.get(), boost::system::errc::no_such_file_or_directory);
+            }
+
         }
     }
 
 
     TEST_F(LocalStreamTest, test_asyncwrite_asyncread)
     {
-        LocalClientStream clientStream(m_ioContext, localEndpointFile);
+        LocalClientStream clientStream(m_ioContext, localEndpointFile, useAbstractNamespace);
 
         {
             std::promise < boost::system::error_code > initPromise;
@@ -300,7 +310,7 @@ namespace daq::stream {
 
     TEST_F(LocalStreamTest, test_write_read)
     {
-        LocalClientStream clientStream(m_ioContext, localEndpointFile);
+        LocalClientStream clientStream(m_ioContext, localEndpointFile, useAbstractNamespace);
         boost::system::error_code ec;
         ec = clientStream.init();
 
@@ -334,7 +344,7 @@ namespace daq::stream {
     {
         boost::system::error_code ec;
         std::size_t bytesWritten;
-        LocalClientStream clientStream(m_ioContext, localEndpointFile);
+        LocalClientStream clientStream(m_ioContext, localEndpointFile, useAbstractNamespace);
         
         
         {
@@ -423,7 +433,7 @@ namespace daq::stream {
     
     TEST_F(LocalStreamTest, test_disconnect_by_server)
     {
-        LocalClientStream clientStream(m_ioContext, localEndpointFile);
+        LocalClientStream clientStream(m_ioContext, localEndpointFile, useAbstractNamespace);
 
         {
             std::promise < boost::system::error_code > initPromise;
