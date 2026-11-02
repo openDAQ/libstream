@@ -84,7 +84,7 @@ namespace daq::stream {
             return;
         }
 
-        m_connectTimer.expires_from_now(boost::posix_time::milliseconds(m_connectTimeout.count()));
+        m_connectTimer.expires_after(m_connectTimeout);
         m_connectTimer.async_wait(std::bind(&TcpClientStream::connectTimeoutCb, this, std::placeholders::_1));
         // Make the connection on the IP address we got from the lookup
         m_socket.async_connect(
