@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <string>
 
+#include <boost/asio/dispatch.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 
@@ -26,7 +27,7 @@ namespace daq::stream {
         {
             m_initCompletionCb(ec);
         };
-        m_ioc.dispatch(completionCb);
+        boost::asio::dispatch(m_ioc, completionCb);
     }
 
     boost::system::error_code FileStream::init()

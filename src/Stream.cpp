@@ -4,7 +4,7 @@ namespace daq::stream {
 
 void Stream::copyDataAndConsume(void* dest, size_t size)
 {
-    memcpy(dest, boost::asio::buffer_cast<const void*>(m_buffer.data()), size);
+    memcpy(dest, static_cast<const void*>(m_buffer.data().data()), size);
     m_buffer.consume(size);
 }
 
@@ -15,7 +15,7 @@ size_t Stream::size() const
 
 const uint8_t* Stream::data() const
 {
-    return boost::asio::buffer_cast<const uint8_t*>(m_buffer.data());
+    return static_cast<const uint8_t*>(m_buffer.data().data());
 }
 
 void Stream::consume(size_t size)

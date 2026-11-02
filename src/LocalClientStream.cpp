@@ -5,6 +5,7 @@
 #include <string>
 
 
+#include <boost/asio/dispatch.hpp>
 #include "stream/LocalClientStream.hpp"
 
 namespace daq::stream {
@@ -23,7 +24,7 @@ namespace daq::stream {
             {
                 m_initCompletionCb(boost::system::error_code());
             };
-            m_ioc.dispatch(completionCb);
+            boost::asio::dispatch(m_ioc, completionCb);
             return;
         }
 

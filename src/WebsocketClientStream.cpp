@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include <boost/asio/dispatch.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/beast/core.hpp>
@@ -37,7 +38,7 @@ void WebsocketClientStream::asyncInit(CompletionCb completionCb)
         {
             m_initCompletionCb(boost::system::error_code());
         };
-        m_ioc.dispatch(completion);
+        boost::asio::dispatch(m_ioc, completion);
         return;
     }
     // Look up the domain name.
